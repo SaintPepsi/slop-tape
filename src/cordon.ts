@@ -32,6 +32,8 @@ export interface TapeCordonOptions {
   maxTapes?: number;
   /** Verlet nodes per tape (resolution of the ribbon). Default 20. */
   nodes?: number;
+  /** Nodes glued flat at each anchored end, so cut tape stays flush/attached rather than hinging at the corner. Default 3. */
+  adhere?: number;
   /** Physics tuning. */
   gravity?: number;
   damping?: number;
@@ -160,6 +162,7 @@ export class TapeCordon {
       minTapes: options.minTapes ?? 5,
       maxTapes: options.maxTapes ?? 8,
       nodes: options.nodes ?? 20,
+      adhere: options.adhere ?? 3,
       gravity: options.gravity ?? 2600,
       damping: options.damping ?? 0.9,
       iterations: options.iterations ?? 12,
@@ -373,13 +376,15 @@ export class TapeCordon {
     const a = { x: ax, y: cy + slope * (ax - cx) };
     const b = { x: bx, y: cy + slope * (bx - cx) };
 
+    const adhere = Math.max(1, Math.min(this.o.adhere, Math.floor(N / 2)));
     const nodes: PhysNode[] = [];
     let total = 0;
     for (let i = 0; i < N; i++) {
       const t = i / (N - 1);
       const x = a.x + (b.x - a.x) * t;
       const y = a.y + (b.y - a.y) * t;
-      nodes.push({ x, y, px: x, py: y, pin: i === 0 || i === N - 1 });
+      // glue a run of nodes at each anchored end so cut tape stays flush, not hinged at the corner
+      nodes.push({ x, y, px: x, py: y, pin: i < adhere || i >= N - adhere });
       if (i > 0) total += Math.hypot(nodes[i].x - nodes[i - 1].x, nodes[i].y - nodes[i - 1].y);
     }
     const links = new Array<boolean>(N - 1).fill(true);

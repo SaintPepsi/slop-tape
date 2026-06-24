@@ -73,6 +73,7 @@ The cordon overlays its container (which is made `position: relative` if it was
 | `message` | `"AI SLOP POLICE · … · "` | Repeated text that flows along each tape. |
 | `minTapes` / `maxTapes` | `5` / `8` | Inclusive seeded tape-count range. |
 | `nodes` | `20` | Verlet nodes per tape (ribbon resolution). |
+| `adhere` | `3` | Nodes glued flat at each end so cut tape stays flush/attached, not hinged at the corner. |
 | `gravity` / `damping` / `iterations` | `2600` / `0.9` / `12` | Physics tuning. |
 | `cuttable` | `true` | Enable drag-to-cut. |
 | `cutRadius` | `34` | Hit radius (px) for the slice stroke. |

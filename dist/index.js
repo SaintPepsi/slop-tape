@@ -1,33 +1,33 @@
-function v(f) {
+function v(p) {
   let t = 2166136261;
-  for (let e = 0; e < f.length; e++)
-    t ^= f.charCodeAt(e), t = Math.imul(t, 16777619);
+  for (let e = 0; e < p.length; e++)
+    t ^= p.charCodeAt(e), t = Math.imul(t, 16777619);
   return t >>> 0;
 }
-function A(f) {
-  let t = f >>> 0;
+function M(p) {
+  let t = p >>> 0;
   return () => {
     t = t + 1831565813 | 0;
     let e = Math.imul(t ^ t >>> 15, 1 | t);
     return e = e + Math.imul(e ^ e >>> 7, 61 | e) ^ e, ((e ^ e >>> 14) >>> 0) / 4294967296;
   };
 }
-function M(f, t) {
-  const e = t / 2, o = f.length, c = [], s = [], l = [];
+function C(p, t) {
+  const e = t / 2, o = p.length, c = [], s = [], l = [];
   for (let i = 0; i < o; i++) {
-    const a = f[i], n = f[Math.max(0, i - 1)], r = f[Math.min(o - 1, i + 1)];
+    const a = p[i], n = p[Math.max(0, i - 1)], r = p[Math.min(o - 1, i + 1)];
     let h = r.x - n.x, u = r.y - n.y;
-    const d = Math.hypot(h, u) || 1;
-    h /= d, u /= d;
-    const m = -u, x = h;
-    c.push(`${(a.x + m * e).toFixed(1)} ${(a.y + x * e).toFixed(1)}`), s.push(`${(a.x - m * e).toFixed(1)} ${(a.y - x * e).toFixed(1)}`), l.push(`${a.x.toFixed(1)} ${a.y.toFixed(1)}`);
+    const f = Math.hypot(h, u) || 1;
+    h /= f, u /= f;
+    const d = -u, x = h;
+    c.push(`${(a.x + d * e).toFixed(1)} ${(a.y + x * e).toFixed(1)}`), s.push(`${(a.x - d * e).toFixed(1)} ${(a.y - x * e).toFixed(1)}`), l.push(`${a.x.toFixed(1)} ${a.y.toFixed(1)}`);
   }
   return s.reverse(), {
     fill: `M${c.join(" L")} L${s.join(" L")} Z`,
     center: `M${l.join(" L")}`
   };
 }
-const y = "http://www.w3.org/2000/svg", C = "http://www.w3.org/1999/xlink", k = 1 / 60, P = {
+const y = "http://www.w3.org/2000/svg", P = "http://www.w3.org/1999/xlink", k = 1 / 60, T = {
   tape: "#f5d800",
   tapeHighlight: "#ffe000",
   tapeShadow: "#d9c000",
@@ -37,10 +37,10 @@ const y = "http://www.w3.org/2000/svg", C = "http://www.w3.org/1999/xlink", k = 
   slice: "#ffffff",
   sliceGlow: "rgba(239,83,80,0.95)"
 };
-let T = 0;
-class L {
+let L = 0;
+class N {
   constructor(t, e = {}) {
-    this.id = ++T, this.tapes = [], this.cuts = /* @__PURE__ */ new Set(), this.count = 0, this.seedRoute = "", this.w = 0, this.h = 0, this.raf = null, this.idleFrames = 0, this.slicing = !1, this.stroke = [], this.reduce = !1, this.mounted = !1, this.resizeTimer = null, this.frame = () => {
+    this.id = ++L, this.tapes = [], this.cuts = /* @__PURE__ */ new Set(), this.count = 0, this.seedRoute = "", this.w = 0, this.h = 0, this.raf = null, this.idleFrames = 0, this.slicing = !1, this.stroke = [], this.reduce = !1, this.mounted = !1, this.resizeTimer = null, this.frame = () => {
       let o = 0;
       for (const c of this.tapes)
         c.cutLink < 0 || (this.step(c), o += this.draw(c));
@@ -63,6 +63,7 @@ class L {
       minTapes: e.minTapes ?? 5,
       maxTapes: e.maxTapes ?? 8,
       nodes: e.nodes ?? 20,
+      adhere: e.adhere ?? 3,
       gravity: e.gravity ?? 2600,
       damping: e.damping ?? 0.9,
       iterations: e.iterations ?? 12,
@@ -75,7 +76,7 @@ class L {
       reducedMotion: e.reducedMotion ?? "auto",
       fontFamily: e.fontFamily ?? '"Arial Narrow","Helvetica Neue",Helvetica,Arial,sans-serif',
       letterSpacing: e.letterSpacing ?? "0.14em",
-      colors: { ...P, ...e.colors ?? {} },
+      colors: { ...T, ...e.colors ?? {} },
       onCut: e.onCut,
       onCleared: e.onCleared
     };
@@ -146,7 +147,7 @@ class L {
   }
   build() {
     this.seedRoute = this.resolveSeed(this.o.seed);
-    const t = v(this.seedRoute), e = A(t), o = this.o.maxTapes - this.o.minTapes + 1;
+    const t = v(this.seedRoute), e = M(t), o = this.o.maxTapes - this.o.minTapes + 1;
     this.count = this.o.minTapes + Math.floor(e() * o), this.w = this.root.clientWidth || this.container.clientWidth, this.h = this.root.clientHeight || this.container.clientHeight, this.cuts = this.loadCuts(this.seedRoute), this.raf && (cancelAnimationFrame(this.raf), this.raf = null), this.cordonSVG.querySelectorAll("g[data-tape]").forEach((s) => s.remove()), this.tapes = [];
     const c = this.o.nodes;
     for (let s = 0; s < this.count; s++) {
@@ -163,14 +164,14 @@ class L {
     this.updateInteractivity(), !this.reduce && this.tapes.some((s) => s.cutLink >= 0) && this.kick();
   }
   makeTape(t, e, o, c) {
-    const s = this.o.nodes, l = this.w / 2, i = Math.max(18, Math.min(this.h - 18, e * this.h)), a = Math.tan(o * Math.PI / 180), n = 4, r = this.w - 4, h = { x: n, y: i + a * (n - l) }, u = { x: r, y: i + a * (r - l) }, d = [];
-    let m = 0;
-    for (let p = 0; p < s; p++) {
-      const b = p / (s - 1), w = h.x + (u.x - h.x) * b, S = h.y + (u.y - h.y) * b;
-      d.push({ x: w, y: S, px: w, py: S, pin: p === 0 || p === s - 1 }), p > 0 && (m += Math.hypot(d[p].x - d[p - 1].x, d[p].y - d[p - 1].y));
+    const s = this.o.nodes, l = this.w / 2, i = Math.max(18, Math.min(this.h - 18, e * this.h)), a = Math.tan(o * Math.PI / 180), n = 4, r = this.w - 4, h = { x: n, y: i + a * (n - l) }, u = { x: r, y: i + a * (r - l) }, f = Math.max(1, Math.min(this.o.adhere, Math.floor(s / 2))), d = [];
+    let x = 0;
+    for (let m = 0; m < s; m++) {
+      const b = m / (s - 1), w = h.x + (u.x - h.x) * b, S = h.y + (u.y - h.y) * b;
+      d.push({ x: w, y: S, px: w, py: S, pin: m < f || m >= s - f }), m > 0 && (x += Math.hypot(d[m].x - d[m - 1].x, d[m].y - d[m - 1].y));
     }
-    const x = new Array(s - 1).fill(!0), g = document.createElementNS(y, "g");
-    return g.setAttribute("data-tape", String(t)), { index: t, nodes: d, links: x, rest: m / (s - 1), total: m, height: c, cutLink: -1, group: g, pieces: [] };
+    const A = new Array(s - 1).fill(!0), g = document.createElementNS(y, "g");
+    return g.setAttribute("data-tape", String(t)), { index: t, nodes: d, links: A, rest: x / (s - 1), total: x, height: c, cutLink: -1, group: g, pieces: [] };
   }
   pieceRanges(t) {
     const e = this.o.nodes, o = [];
@@ -198,7 +199,7 @@ class L {
       const h = document.createElementNS(y, "text");
       h.setAttribute("font-size", String(e)), h.setAttribute("font-weight", "700"), h.setAttribute("dominant-baseline", "central"), h.setAttribute("fill", this.o.colors.text), h.style.fontFamily = this.o.fontFamily, h.style.letterSpacing = this.o.letterSpacing, h.style.userSelect = "none";
       const u = document.createElementNS(y, "textPath");
-      u.setAttribute("href", `#${a}`), u.setAttributeNS(C, "href", `#${a}`), u.textContent = c, h.appendChild(u), t.group.append(n, r, h), t.pieces.push({ s, e: l, ribbon: n, centerline: r });
+      u.setAttribute("href", `#${a}`), u.setAttributeNS(P, "href", `#${a}`), u.textContent = c, h.appendChild(u), t.group.append(n, r, h), t.pieces.push({ s, e: l, ribbon: n, centerline: r });
     });
   }
   // ---- physics -------------------------------------------------------------
@@ -215,8 +216,8 @@ class L {
         if (!t.links[a]) continue;
         const n = t.nodes[a], r = t.nodes[a + 1];
         let h = r.x - n.x, u = r.y - n.y;
-        const d = Math.hypot(h, u) || 1e-3, m = (d - t.rest) / d * 0.5;
-        h *= m, u *= m, n.pin || (n.x += h, n.y += u), r.pin || (r.x -= h, r.y -= u);
+        const f = Math.hypot(h, u) || 1e-3, d = (f - t.rest) / f * 0.5;
+        h *= d, u *= d, n.pin || (n.x += h, n.y += u), r.pin || (r.x -= h, r.y -= u);
       }
     const l = t.height / 2;
     for (const i of t.nodes)
@@ -225,7 +226,7 @@ class L {
   draw(t) {
     for (const o of t.pieces) {
       if (!o) continue;
-      const { fill: c, center: s } = M(t.nodes.slice(o.s, o.e + 1), t.height);
+      const { fill: c, center: s } = C(t.nodes.slice(o.s, o.e + 1), t.height);
       o.ribbon.setAttribute("d", c), o.centerline.setAttribute("d", s);
     }
     let e = 0;
@@ -249,8 +250,8 @@ class L {
       const c = this.stroke.filter((n) => {
         let r = 1 / 0;
         for (let h = 1; h < t - 1; h++) {
-          const u = o.nodes[h], d = Math.hypot(u.x - n.x, u.y - n.y);
-          d < r && (r = d);
+          const u = o.nodes[h], f = Math.hypot(u.x - n.x, u.y - n.y);
+          f < r && (r = f);
         }
         return r < e;
       });
@@ -280,9 +281,9 @@ class L {
   }
 }
 export {
-  L as TapeCordon,
+  N as TapeCordon,
   v as hashString,
-  A as mulberry32,
-  M as ribbonPaths
+  M as mulberry32,
+  C as ribbonPaths
 };
 //# sourceMappingURL=index.js.map

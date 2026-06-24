@@ -128,6 +128,8 @@ export declare interface TapeCordonOptions {
     maxTapes?: number;
     /** Verlet nodes per tape (resolution of the ribbon). Default 20. */
     nodes?: number;
+    /** Nodes glued flat at each anchored end, so cut tape stays flush/attached rather than hinging at the corner. Default 3. */
+    adhere?: number;
     /** Physics tuning. */
     gravity?: number;
     damping?: number;
