@@ -44,7 +44,7 @@ export declare class TapeCordon {
     private sliceSVG;
     private slicePoly;
     private tapes;
-    private cuts;
+    private cutLinks;
     private count;
     private seedRoute;
     private w;
@@ -146,6 +146,8 @@ export declare interface TapeCordonOptions {
     scrim?: boolean;
     /** Overlay z-index. Default 40. */
     zIndex?: number;
+    /** Opacity of the (cut) ribbons once every tape on the page is cut. Default 0.7. */
+    clearedOpacity?: number;
     /** Honour prefers-reduced-motion (no physics, instant gap). `"auto"` | boolean. Default "auto". */
     reducedMotion?: boolean | "auto";
     /** Font for the warning text. */

@@ -50,6 +50,8 @@ export interface TapeCordonOptions {
   scrim?: boolean;
   /** Overlay z-index. Default 40. */
   zIndex?: number;
+  /** Opacity of the (cut) ribbons once every tape on the page is cut. Default 0.7. */
+  clearedOpacity?: number;
   /** Honour prefers-reduced-motion (no physics, instant gap). `"auto"` | boolean. Default "auto". */
   reducedMotion?: boolean | "auto";
   /** Font for the warning text. */
@@ -95,6 +97,8 @@ interface Tape {
   height: number;
   /** -1 while uncut; the severed link index once cut. */
   cutLink: number;
+  /** Seeded character offset so each tape's text starts at a different phase. */
+  textShift: number;
   group: SVGGElement;
   pieces: (Piece | null)[];
 }
@@ -137,7 +141,7 @@ export class TapeCordon {
   private slicePoly!: SVGPolylineElement;
 
   private tapes: Tape[] = [];
-  private cuts = new Set<number>();
+  private cutLinks = new Map<number, number>(); // tape index → severed link index
   private count = 0;
   private seedRoute = "";
   private w = 0;
@@ -172,6 +176,7 @@ export class TapeCordon {
       storageKey: options.storageKey ?? ((seed) => `slop-tape:${seed}`),
       scrim: options.scrim ?? true,
       zIndex: options.zIndex ?? 40,
+      clearedOpacity: options.clearedOpacity ?? 0.7,
       reducedMotion: options.reducedMotion ?? "auto",
       fontFamily:
         options.fontFamily ?? '"Arial Narrow","Helvetica Neue",Helvetica,Arial,sans-serif',
@@ -186,7 +191,7 @@ export class TapeCordon {
 
   /** Number of tapes cut on the current page. */
   get cutCount(): number {
-    return this.cuts.size;
+    return this.cutLinks.size;
   }
 
   /** Total tapes the current seed produced. */
@@ -196,7 +201,7 @@ export class TapeCordon {
 
   /** True once every tape on the page has been cut. */
   get isCleared(): boolean {
-    return this.count > 0 && this.cuts.size >= this.count;
+    return this.count > 0 && this.cutLinks.size >= this.count;
   }
 
   /** Build the overlay and start. No-op on the server or if already mounted. */
@@ -271,7 +276,7 @@ export class TapeCordon {
         /* private mode / quota */
       }
     }
-    this.cuts.clear();
+    this.cutLinks.clear();
     if (this.mounted) this.build();
     return this;
   }
@@ -303,20 +308,30 @@ export class TapeCordon {
     return this.o.stripQuery ? seed.split("?")[0].split("#")[0] : seed;
   }
 
-  private loadCuts(route: string): Set<number> {
-    if (!this.o.persist || typeof localStorage === "undefined") return new Set();
+  private loadCuts(route: string): Map<number, number> {
+    const cuts = new Map<number, number>();
+    if (!this.o.persist || typeof localStorage === "undefined") return cuts;
     try {
       const raw = localStorage.getItem(this.o.storageKey(route));
-      return new Set(raw ? (JSON.parse(raw) as number[]) : []);
+      if (!raw) return cuts;
+      const data: unknown = JSON.parse(raw);
+      if (Array.isArray(data)) {
+        for (const item of data) {
+          // new format: [tapeIndex, cutLink]; legacy format: tapeIndex (link -1 → derive later)
+          if (Array.isArray(item) && item.length === 2) cuts.set(Number(item[0]), Number(item[1]));
+          else if (typeof item === "number") cuts.set(item, -1);
+        }
+      }
     } catch {
-      return new Set();
+      /* corrupt / private mode */
     }
+    return cuts;
   }
 
   private saveCuts(): void {
     if (!this.o.persist || typeof localStorage === "undefined") return;
     try {
-      localStorage.setItem(this.o.storageKey(this.seedRoute), JSON.stringify([...this.cuts]));
+      localStorage.setItem(this.o.storageKey(this.seedRoute), JSON.stringify([...this.cutLinks]));
     } catch {
       /* private mode / quota */
     }
@@ -331,7 +346,7 @@ export class TapeCordon {
 
     this.w = this.root.clientWidth || this.container.clientWidth;
     this.h = this.root.clientHeight || this.container.clientHeight;
-    this.cuts = this.loadCuts(this.seedRoute);
+    this.cutLinks = this.loadCuts(this.seedRoute);
 
     if (this.raf) {
       cancelAnimationFrame(this.raf);
@@ -347,10 +362,14 @@ export class TapeCordon {
       const rot = (rng() * 2 - 1) * 16;
       const height = 34 + rng() * 20;
       const tape = this.makeTape(i, yFrac, rot, height);
-      if (this.cuts.has(i)) {
-        const lk = 1 + (hashString(`${this.seedRoute}:${i}`) % (N - 2));
+      const stored = this.cutLinks.get(i);
+      if (stored !== undefined) {
+        // use the persisted cut location; legacy entries (-1) derive one and upgrade
+        const raw = stored >= 0 ? stored : 1 + (hashString(`${this.seedRoute}:${i}`) % (N - 2));
+        const lk = Math.max(1, Math.min(N - 2, raw));
         tape.cutLink = lk;
         tape.links[lk] = false;
+        if (stored !== lk) this.cutLinks.set(i, lk);
       }
       this.buildGroup(tape);
       this.tapes.push(tape);
@@ -393,7 +412,8 @@ export class TapeCordon {
     const links = new Array<boolean>(N - 1).fill(true);
     const group = document.createElementNS(SVGNS, "g");
     group.setAttribute("data-tape", String(index));
-    return { index, nodes, links, rest: total / (N - 1), total, height, cutLink: -1, group, pieces: [] };
+    const textShift = hashString(`${this.seedRoute}:txt:${index}`) % this.o.message.length;
+    return { index, nodes, links, rest: total / (N - 1), total, height, cutLink: -1, textShift, group, pieces: [] };
   }
 
   private pieceRanges(t: Tape): [number, number][] {
@@ -420,7 +440,10 @@ export class TapeCordon {
     t.pieces = [];
     const fs = t.height * 0.5;
     const reps = Math.max(8, Math.ceil(t.total / (this.o.message.length * t.height * 0.3)));
-    const full = this.o.message.repeat(reps);
+    // rotate the message by a seeded offset so tapes don't all start at the same word
+    const base = this.o.message;
+    const shift = ((t.textShift % base.length) + base.length) % base.length;
+    const full = (base.slice(shift) + base.slice(0, shift)).repeat(reps);
 
     this.pieceRanges(t).forEach(([s, e], pi) => {
       if (e <= s) {
@@ -561,9 +584,9 @@ export class TapeCordon {
     t.links[link] = false;
     this.rebuildPieces(t);
     this.draw(t);
-    this.cuts.add(t.index);
+    this.cutLinks.set(t.index, link);
     this.saveCuts();
-    this.o.onCut?.({ index: t.index, cutCount: this.cuts.size, total: this.count });
+    this.o.onCut?.({ index: t.index, cutCount: this.cutLinks.size, total: this.count });
     if (this.isCleared) {
       this.updateInteractivity();
       this.o.onCleared?.();
@@ -639,6 +662,8 @@ export class TapeCordon {
     this.root.style.pointerEvents = interactive ? "auto" : "none";
     this.root.style.cursor = interactive ? "crosshair" : "";
     this.root.style.background = this.o.scrim && !cleared ? this.o.colors.scrim : "transparent";
+    // fade the cut ribbons once the whole page is cleared
+    this.cordonSVG.style.opacity = cleared ? String(this.o.clearedOpacity) : "1";
   }
 
   private onResize(): void {
