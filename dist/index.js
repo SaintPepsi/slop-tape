@@ -4,7 +4,7 @@ function b(p) {
     t ^= p.charCodeAt(e), t = Math.imul(t, 16777619);
   return t >>> 0;
 }
-function C(p) {
+function M(p) {
   let t = p >>> 0;
   return () => {
     t = t + 1831565813 | 0;
@@ -12,7 +12,7 @@ function C(p) {
     return e = e + Math.imul(e ^ e >>> 7, 61 | e) ^ e, ((e ^ e >>> 14) >>> 0) / 4294967296;
   };
 }
-function N(p, t) {
+function P(p, t) {
   const e = t / 2, o = p.length, n = [], s = [], u = [];
   for (let i = 0; i < o; i++) {
     const a = p[i], c = p[Math.max(0, i - 1)], r = p[Math.min(o - 1, i + 1)];
@@ -27,7 +27,7 @@ function N(p, t) {
     center: `M${u.join(" L")}`
   };
 }
-const x = "http://www.w3.org/2000/svg", P = "http://www.w3.org/1999/xlink", A = 1 / 60, T = {
+const x = "http://www.w3.org/2000/svg", T = "http://www.w3.org/1999/xlink", A = 1 / 60, $ = {
   tape: "#f5d800",
   tapeHighlight: "#ffe000",
   tapeShadow: "#d9c000",
@@ -37,10 +37,10 @@ const x = "http://www.w3.org/2000/svg", P = "http://www.w3.org/1999/xlink", A = 
   slice: "#ffffff",
   sliceGlow: "rgba(239,83,80,0.95)"
 };
-let $ = 0;
-class E {
+let E = 0;
+class z {
   constructor(t, e = {}) {
-    this.id = ++$, this.tapes = [], this.cutLinks = /* @__PURE__ */ new Map(), this.count = 0, this.seedRoute = "", this.w = 0, this.h = 0, this.raf = null, this.idleFrames = 0, this.slicing = !1, this.stroke = [], this.reduce = !1, this.mounted = !1, this.resizeTimer = null, this.frame = () => {
+    this.id = ++E, this.tapes = [], this.cutLinks = /* @__PURE__ */ new Map(), this.count = 0, this.seedRoute = "", this.w = 0, this.h = 0, this.raf = null, this.idleFrames = 0, this.slicing = !1, this.stroke = [], this.reduce = !1, this.mounted = !1, this.resizeTimer = null, this.frame = () => {
       let o = 0;
       for (const n of this.tapes)
         n.cutLink < 0 || (this.step(n), o += this.draw(n));
@@ -74,10 +74,11 @@ class E {
       scrim: e.scrim ?? !0,
       zIndex: e.zIndex ?? 40,
       clearedOpacity: e.clearedOpacity ?? 0.7,
+      clipVertical: e.clipVertical ?? !0,
       reducedMotion: e.reducedMotion ?? "auto",
       fontFamily: e.fontFamily ?? '"Arial Narrow","Helvetica Neue",Helvetica,Arial,sans-serif',
       letterSpacing: e.letterSpacing ?? "0.14em",
-      colors: { ...T, ...e.colors ?? {} },
+      colors: { ...$, ...e.colors ?? {} },
       onCut: e.onCut,
       onCleared: e.onCleared
     };
@@ -100,7 +101,9 @@ class E {
     if (typeof window > "u" || this.mounted) return this;
     this.reduce = this.o.reducedMotion === "auto" ? window.matchMedia("(prefers-reduced-motion: reduce)").matches : this.o.reducedMotion, getComputedStyle(this.container).position === "static" && (this.container.style.position = "relative");
     const t = document.createElement("div");
-    return t.className = "slop-tape-root", t.style.cssText = `position:absolute;inset:0;width:100%;height:100%;overflow:hidden;z-index:${this.o.zIndex};`, this.root = t, this.cordonSVG = document.createElementNS(x, "svg"), this.cordonSVG.style.cssText = "position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;", this.cordonSVG.innerHTML = `<defs><linearGradient id="slop-haz-${this.id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${this.o.colors.tape}"/><stop offset="0.5" stop-color="${this.o.colors.tapeHighlight}"/><stop offset="1" stop-color="${this.o.colors.tapeShadow}"/></linearGradient></defs>`, this.sliceSVG = document.createElementNS(x, "svg"), this.sliceSVG.style.cssText = "position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:2;", this.slicePoly = document.createElementNS(x, "polyline"), this.slicePoly.setAttribute("fill", "none"), this.slicePoly.setAttribute("stroke", this.o.colors.slice), this.slicePoly.setAttribute("stroke-width", "2.5"), this.slicePoly.setAttribute("stroke-linecap", "round"), this.slicePoly.setAttribute("stroke-linejoin", "round"), this.slicePoly.style.filter = `drop-shadow(0 0 5px ${this.o.colors.sliceGlow})`, this.sliceSVG.appendChild(this.slicePoly), t.append(this.cordonSVG, this.sliceSVG), this.container.appendChild(t), this.o.cuttable && (t.addEventListener("pointerdown", this.onPointerDown), window.addEventListener("pointermove", this.onPointerMove), window.addEventListener("pointerup", this.onPointerUp)), this.resizeObserver = new ResizeObserver(() => this.onResize()), this.resizeObserver.observe(this.container), this.mounted = !0, this.build(), this;
+    t.className = "slop-tape-root";
+    const e = this.o.clipVertical ? "0px" : "-9999px";
+    return t.style.cssText = `position:absolute;inset:0;width:100%;height:100%;overflow:visible;clip-path:inset(${e} 0px ${e} 0px);z-index:${this.o.zIndex};`, this.root = t, this.cordonSVG = document.createElementNS(x, "svg"), this.cordonSVG.style.cssText = "position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;", this.cordonSVG.innerHTML = `<defs><linearGradient id="slop-haz-${this.id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${this.o.colors.tape}"/><stop offset="0.5" stop-color="${this.o.colors.tapeHighlight}"/><stop offset="1" stop-color="${this.o.colors.tapeShadow}"/></linearGradient></defs>`, this.sliceSVG = document.createElementNS(x, "svg"), this.sliceSVG.style.cssText = "position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:2;", this.slicePoly = document.createElementNS(x, "polyline"), this.slicePoly.setAttribute("fill", "none"), this.slicePoly.setAttribute("stroke", this.o.colors.slice), this.slicePoly.setAttribute("stroke-width", "2.5"), this.slicePoly.setAttribute("stroke-linecap", "round"), this.slicePoly.setAttribute("stroke-linejoin", "round"), this.slicePoly.style.filter = `drop-shadow(0 0 5px ${this.o.colors.sliceGlow})`, this.sliceSVG.appendChild(this.slicePoly), t.append(this.cordonSVG, this.sliceSVG), this.container.appendChild(t), this.o.cuttable && (t.addEventListener("pointerdown", this.onPointerDown), window.addEventListener("pointermove", this.onPointerMove), window.addEventListener("pointerup", this.onPointerUp)), this.resizeObserver = new ResizeObserver(() => this.onResize()), this.resizeObserver.observe(this.container), this.mounted = !0, this.build(), this;
   }
   /** Change the seed (e.g. on SPA navigation) and re-lay the cordon. */
   setSeed(t) {
@@ -153,7 +156,7 @@ class E {
   }
   build() {
     this.seedRoute = this.resolveSeed(this.o.seed);
-    const t = b(this.seedRoute), e = C(t), o = this.o.maxTapes - this.o.minTapes + 1;
+    const t = b(this.seedRoute), e = M(t), o = this.o.maxTapes - this.o.minTapes + 1;
     this.count = this.o.minTapes + Math.floor(e() * o), this.w = this.root.clientWidth || this.container.clientWidth, this.h = this.root.clientHeight || this.container.clientHeight, this.cutLinks = this.loadCuts(this.seedRoute), this.raf && (cancelAnimationFrame(this.raf), this.raf = null), this.cordonSVG.querySelectorAll("g[data-tape]").forEach((s) => s.remove()), this.tapes = [];
     const n = this.o.nodes;
     for (let s = 0; s < this.count; s++) {
@@ -173,13 +176,13 @@ class E {
     const s = this.o.nodes, u = this.w / 2, i = Math.max(18, Math.min(this.h - 18, e * this.h)), a = Math.tan(o * Math.PI / 180), c = Math.max(28, n), r = -c, h = this.w + c, d = { x: r, y: i + a * (r - u) }, l = { x: h, y: i + a * (h - u) }, f = Math.max(1, Math.min(this.o.adhere, Math.floor(s / 2))), y = [];
     let g = 0;
     for (let m = 0; m < s; m++) {
-      const v = m / (s - 1), S = d.x + (l.x - d.x) * v, k = d.y + (l.y - d.y) * v;
+      const w = m / (s - 1), S = d.x + (l.x - d.x) * w, k = d.y + (l.y - d.y) * w;
       y.push({ x: S, y: k, px: S, py: k, pin: m < f || m >= s - f }), m > 0 && (g += Math.hypot(y[m].x - y[m - 1].x, y[m].y - y[m - 1].y));
     }
-    const M = new Array(s - 1).fill(!0), w = document.createElementNS(x, "g");
-    w.setAttribute("data-tape", String(t));
-    const L = b(`${this.seedRoute}:txt:${t}`) % this.o.message.length;
-    return { index: t, nodes: y, links: M, rest: g / (s - 1), total: g, height: n, cutLink: -1, textShift: L, group: w, pieces: [] };
+    const L = new Array(s - 1).fill(!0), v = document.createElementNS(x, "g");
+    v.setAttribute("data-tape", String(t));
+    const C = (b(this.seedRoute) ^ Math.imul(t + 1, 2654435761)) >>> 0, N = Math.floor(M(C)() * this.o.message.length);
+    return { index: t, nodes: y, links: L, rest: g / (s - 1), total: g, height: n, cutLink: -1, textShift: N, group: v, pieces: [] };
   }
   pieceRanges(t) {
     const e = this.o.nodes, o = [];
@@ -207,7 +210,7 @@ class E {
       const l = document.createElementNS(x, "text");
       l.setAttribute("font-size", String(e)), l.setAttribute("font-weight", "700"), l.setAttribute("dominant-baseline", "central"), l.setAttribute("fill", this.o.colors.text), l.style.fontFamily = this.o.fontFamily, l.style.letterSpacing = this.o.letterSpacing, l.style.userSelect = "none";
       const f = document.createElementNS(x, "textPath");
-      f.setAttribute("href", `#${r}`), f.setAttributeNS(P, "href", `#${r}`), f.textContent = u, l.appendChild(f), t.group.append(h, d, l), t.pieces.push({ s: i, e: a, ribbon: h, centerline: d });
+      f.setAttribute("href", `#${r}`), f.setAttributeNS(T, "href", `#${r}`), f.textContent = u, l.appendChild(f), t.group.append(h, d, l), t.pieces.push({ s: i, e: a, ribbon: h, centerline: d });
     });
   }
   // ---- physics -------------------------------------------------------------
@@ -234,7 +237,7 @@ class E {
   draw(t) {
     for (const o of t.pieces) {
       if (!o) continue;
-      const { fill: n, center: s } = N(t.nodes.slice(o.s, o.e + 1), t.height);
+      const { fill: n, center: s } = P(t.nodes.slice(o.s, o.e + 1), t.height);
       o.ribbon.setAttribute("d", n), o.centerline.setAttribute("d", s);
     }
     let e = 0;
@@ -289,9 +292,9 @@ class E {
   }
 }
 export {
-  E as TapeCordon,
+  z as TapeCordon,
   b as hashString,
-  C as mulberry32,
-  N as ribbonPaths
+  M as mulberry32,
+  P as ribbonPaths
 };
 //# sourceMappingURL=index.js.map

@@ -52,6 +52,13 @@ export interface TapeCordonOptions {
   zIndex?: number;
   /** Opacity of the (cut) ribbons once every tape on the page is cut. Default 0.7. */
   clearedOpacity?: number;
+  /**
+   * Clip the top/bottom of the overlay. Sides are always clipped (so tape wraps over
+   * the edges); this only controls vertical. `true` (default) clips all sides — right
+   * for small/nicher targets. `false` lets the top/bottom tapes show fully — right for
+   * tall content like an article column.
+   */
+  clipVertical?: boolean;
   /** Honour prefers-reduced-motion (no physics, instant gap). `"auto"` | boolean. Default "auto". */
   reducedMotion?: boolean | "auto";
   /** Font for the warning text. */
@@ -177,6 +184,7 @@ export class TapeCordon {
       scrim: options.scrim ?? true,
       zIndex: options.zIndex ?? 40,
       clearedOpacity: options.clearedOpacity ?? 0.7,
+      clipVertical: options.clipVertical ?? true,
       reducedMotion: options.reducedMotion ?? "auto",
       fontFamily:
         options.fontFamily ?? '"Arial Narrow","Helvetica Neue",Helvetica,Arial,sans-serif',
@@ -219,7 +227,9 @@ export class TapeCordon {
 
     const root = document.createElement("div");
     root.className = "slop-tape-root";
-    root.style.cssText = `position:absolute;inset:0;width:100%;height:100%;overflow:hidden;z-index:${this.o.zIndex};`;
+    // sides always clip (tape wraps over the edges); top/bottom clip only when clipVertical
+    const v = this.o.clipVertical ? "0px" : "-9999px";
+    root.style.cssText = `position:absolute;inset:0;width:100%;height:100%;overflow:visible;clip-path:inset(${v} 0px ${v} 0px);z-index:${this.o.zIndex};`;
     this.root = root;
 
     this.cordonSVG = document.createElementNS(SVGNS, "svg");
@@ -412,7 +422,10 @@ export class TapeCordon {
     const links = new Array<boolean>(N - 1).fill(true);
     const group = document.createElementNS(SVGNS, "g");
     group.setAttribute("data-tape", String(index));
-    const textShift = hashString(`${this.seedRoute}:txt:${index}`) % this.o.message.length;
+    // mix the index hard (golden-ratio multiply) before seeding a PRNG, otherwise a
+    // trailing one-char change barely moves an FNV-1a hash and shifts cluster together
+    const textSeed = (hashString(this.seedRoute) ^ Math.imul(index + 1, 2654435761)) >>> 0;
+    const textShift = Math.floor(mulberry32(textSeed)() * this.o.message.length);
     return { index, nodes, links, rest: total / (N - 1), total, height, cutLink: -1, textShift, group, pieces: [] };
   }
 

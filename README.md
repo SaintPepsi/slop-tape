@@ -82,6 +82,7 @@ The cordon overlays its container (which is made `position: relative` if it was
 | `scrim` | `true` | Dim the content behind the cordon. |
 | `zIndex` | `40` | Overlay stacking. |
 | `clearedOpacity` | `0.7` | Ribbon opacity once every tape on the page is cut. |
+| `clipVertical` | `true` | Clip top/bottom of the overlay. Sides always clip (wrap). `false` lets top/bottom tapes show fully — for tall content like an article. |
 | `reducedMotion` | `"auto"` | `"auto"` reads the media query; or force boolean. |
 | `colors` | hazard yellow/black | `{ tape, tapeHighlight, tapeShadow, edge, text, scrim, slice, sliceGlow }`. |
 | `onCut` / `onCleared` | — | Callbacks. |

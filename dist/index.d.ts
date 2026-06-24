@@ -148,6 +148,13 @@ export declare interface TapeCordonOptions {
     zIndex?: number;
     /** Opacity of the (cut) ribbons once every tape on the page is cut. Default 0.7. */
     clearedOpacity?: number;
+    /**
+     * Clip the top/bottom of the overlay. Sides are always clipped (so tape wraps over
+     * the edges); this only controls vertical. `true` (default) clips all sides — right
+     * for small/nicher targets. `false` lets the top/bottom tapes show fully — right for
+     * tall content like an article column.
+     */
+    clipVertical?: boolean;
     /** Honour prefers-reduced-motion (no physics, instant gap). `"auto"` | boolean. Default "auto". */
     reducedMotion?: boolean | "auto";
     /** Font for the warning text. */
