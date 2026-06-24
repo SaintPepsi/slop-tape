@@ -1,33 +1,33 @@
-function v(p) {
+function k(f) {
   let t = 2166136261;
-  for (let e = 0; e < p.length; e++)
-    t ^= p.charCodeAt(e), t = Math.imul(t, 16777619);
+  for (let e = 0; e < f.length; e++)
+    t ^= f.charCodeAt(e), t = Math.imul(t, 16777619);
   return t >>> 0;
 }
-function M(p) {
-  let t = p >>> 0;
+function C(f) {
+  let t = f >>> 0;
   return () => {
     t = t + 1831565813 | 0;
     let e = Math.imul(t ^ t >>> 15, 1 | t);
     return e = e + Math.imul(e ^ e >>> 7, 61 | e) ^ e, ((e ^ e >>> 14) >>> 0) / 4294967296;
   };
 }
-function C(p, t) {
-  const e = t / 2, o = p.length, c = [], s = [], l = [];
+function P(f, t) {
+  const e = t / 2, o = f.length, r = [], s = [], l = [];
   for (let i = 0; i < o; i++) {
-    const a = p[i], n = p[Math.max(0, i - 1)], r = p[Math.min(o - 1, i + 1)];
-    let h = r.x - n.x, u = r.y - n.y;
-    const f = Math.hypot(h, u) || 1;
-    h /= f, u /= f;
-    const d = -u, x = h;
-    c.push(`${(a.x + d * e).toFixed(1)} ${(a.y + x * e).toFixed(1)}`), s.push(`${(a.x - d * e).toFixed(1)} ${(a.y - x * e).toFixed(1)}`), l.push(`${a.x.toFixed(1)} ${a.y.toFixed(1)}`);
+    const a = f[i], n = f[Math.max(0, i - 1)], h = f[Math.min(o - 1, i + 1)];
+    let c = h.x - n.x, u = h.y - n.y;
+    const d = Math.hypot(c, u) || 1;
+    c /= d, u /= d;
+    const y = -u, m = c;
+    r.push(`${(a.x + y * e).toFixed(1)} ${(a.y + m * e).toFixed(1)}`), s.push(`${(a.x - y * e).toFixed(1)} ${(a.y - m * e).toFixed(1)}`), l.push(`${a.x.toFixed(1)} ${a.y.toFixed(1)}`);
   }
   return s.reverse(), {
-    fill: `M${c.join(" L")} L${s.join(" L")} Z`,
+    fill: `M${r.join(" L")} L${s.join(" L")} Z`,
     center: `M${l.join(" L")}`
   };
 }
-const y = "http://www.w3.org/2000/svg", P = "http://www.w3.org/1999/xlink", k = 1 / 60, T = {
+const x = "http://www.w3.org/2000/svg", T = "http://www.w3.org/1999/xlink", A = 1 / 60, L = {
   tape: "#f5d800",
   tapeHighlight: "#ffe000",
   tapeShadow: "#d9c000",
@@ -37,21 +37,21 @@ const y = "http://www.w3.org/2000/svg", P = "http://www.w3.org/1999/xlink", k = 
   slice: "#ffffff",
   sliceGlow: "rgba(239,83,80,0.95)"
 };
-let L = 0;
-class N {
+let N = 0;
+class $ {
   constructor(t, e = {}) {
-    this.id = ++L, this.tapes = [], this.cuts = /* @__PURE__ */ new Set(), this.count = 0, this.seedRoute = "", this.w = 0, this.h = 0, this.raf = null, this.idleFrames = 0, this.slicing = !1, this.stroke = [], this.reduce = !1, this.mounted = !1, this.resizeTimer = null, this.frame = () => {
+    this.id = ++N, this.tapes = [], this.cuts = /* @__PURE__ */ new Set(), this.count = 0, this.seedRoute = "", this.w = 0, this.h = 0, this.raf = null, this.idleFrames = 0, this.slicing = !1, this.stroke = [], this.reduce = !1, this.mounted = !1, this.resizeTimer = null, this.frame = () => {
       let o = 0;
-      for (const c of this.tapes)
-        c.cutLink < 0 || (this.step(c), o += this.draw(c));
+      for (const r of this.tapes)
+        r.cutLink < 0 || (this.step(r), o += this.draw(r));
       if (o < 0.4 ? this.idleFrames++ : this.idleFrames = 0, this.idleFrames > 20) {
         this.raf = null;
         return;
       }
       this.raf = requestAnimationFrame(this.frame);
     }, this.onPointerDown = (o) => {
-      var c, s;
-      this.isCleared || (this.slicing = !0, (s = (c = this.root).setPointerCapture) == null || s.call(c, o.pointerId), this.stroke = [this.toLocal(o)], this.drawStroke());
+      var r, s;
+      this.isCleared || (this.slicing = !0, (s = (r = this.root).setPointerCapture) == null || s.call(r, o.pointerId), this.stroke = [this.toLocal(o)], this.drawStroke());
     }, this.onPointerMove = (o) => {
       this.slicing && (this.stroke.push(this.toLocal(o)), this.drawStroke());
     }, this.onPointerUp = () => {
@@ -76,7 +76,7 @@ class N {
       reducedMotion: e.reducedMotion ?? "auto",
       fontFamily: e.fontFamily ?? '"Arial Narrow","Helvetica Neue",Helvetica,Arial,sans-serif',
       letterSpacing: e.letterSpacing ?? "0.14em",
-      colors: { ...T, ...e.colors ?? {} },
+      colors: { ...L, ...e.colors ?? {} },
       onCut: e.onCut,
       onCleared: e.onCleared
     };
@@ -99,7 +99,7 @@ class N {
     if (typeof window > "u" || this.mounted) return this;
     this.reduce = this.o.reducedMotion === "auto" ? window.matchMedia("(prefers-reduced-motion: reduce)").matches : this.o.reducedMotion, getComputedStyle(this.container).position === "static" && (this.container.style.position = "relative");
     const t = document.createElement("div");
-    return t.className = "slop-tape-root", t.style.cssText = `position:absolute;inset:0;width:100%;height:100%;overflow:hidden;z-index:${this.o.zIndex};`, this.root = t, this.cordonSVG = document.createElementNS(y, "svg"), this.cordonSVG.style.cssText = "position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;", this.cordonSVG.innerHTML = `<defs><linearGradient id="slop-haz-${this.id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${this.o.colors.tape}"/><stop offset="0.5" stop-color="${this.o.colors.tapeHighlight}"/><stop offset="1" stop-color="${this.o.colors.tapeShadow}"/></linearGradient></defs>`, this.sliceSVG = document.createElementNS(y, "svg"), this.sliceSVG.style.cssText = "position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:2;", this.slicePoly = document.createElementNS(y, "polyline"), this.slicePoly.setAttribute("fill", "none"), this.slicePoly.setAttribute("stroke", this.o.colors.slice), this.slicePoly.setAttribute("stroke-width", "2.5"), this.slicePoly.setAttribute("stroke-linecap", "round"), this.slicePoly.setAttribute("stroke-linejoin", "round"), this.slicePoly.style.filter = `drop-shadow(0 0 5px ${this.o.colors.sliceGlow})`, this.sliceSVG.appendChild(this.slicePoly), t.append(this.cordonSVG, this.sliceSVG), this.container.appendChild(t), this.o.cuttable && (t.addEventListener("pointerdown", this.onPointerDown), window.addEventListener("pointermove", this.onPointerMove), window.addEventListener("pointerup", this.onPointerUp)), this.resizeObserver = new ResizeObserver(() => this.onResize()), this.resizeObserver.observe(this.container), this.mounted = !0, this.build(), this;
+    return t.className = "slop-tape-root", t.style.cssText = `position:absolute;inset:0;width:100%;height:100%;overflow:hidden;z-index:${this.o.zIndex};`, this.root = t, this.cordonSVG = document.createElementNS(x, "svg"), this.cordonSVG.style.cssText = "position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;", this.cordonSVG.innerHTML = `<defs><linearGradient id="slop-haz-${this.id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${this.o.colors.tape}"/><stop offset="0.5" stop-color="${this.o.colors.tapeHighlight}"/><stop offset="1" stop-color="${this.o.colors.tapeShadow}"/></linearGradient></defs>`, this.sliceSVG = document.createElementNS(x, "svg"), this.sliceSVG.style.cssText = "position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:2;", this.slicePoly = document.createElementNS(x, "polyline"), this.slicePoly.setAttribute("fill", "none"), this.slicePoly.setAttribute("stroke", this.o.colors.slice), this.slicePoly.setAttribute("stroke-width", "2.5"), this.slicePoly.setAttribute("stroke-linecap", "round"), this.slicePoly.setAttribute("stroke-linejoin", "round"), this.slicePoly.style.filter = `drop-shadow(0 0 5px ${this.o.colors.sliceGlow})`, this.sliceSVG.appendChild(this.slicePoly), t.append(this.cordonSVG, this.sliceSVG), this.container.appendChild(t), this.o.cuttable && (t.addEventListener("pointerdown", this.onPointerDown), window.addEventListener("pointermove", this.onPointerMove), window.addEventListener("pointerup", this.onPointerUp)), this.resizeObserver = new ResizeObserver(() => this.onResize()), this.resizeObserver.observe(this.container), this.mounted = !0, this.build(), this;
   }
   /** Change the seed (e.g. on SPA navigation) and re-lay the cordon. */
   setSeed(t) {
@@ -147,38 +147,38 @@ class N {
   }
   build() {
     this.seedRoute = this.resolveSeed(this.o.seed);
-    const t = v(this.seedRoute), e = M(t), o = this.o.maxTapes - this.o.minTapes + 1;
+    const t = k(this.seedRoute), e = C(t), o = this.o.maxTapes - this.o.minTapes + 1;
     this.count = this.o.minTapes + Math.floor(e() * o), this.w = this.root.clientWidth || this.container.clientWidth, this.h = this.root.clientHeight || this.container.clientHeight, this.cuts = this.loadCuts(this.seedRoute), this.raf && (cancelAnimationFrame(this.raf), this.raf = null), this.cordonSVG.querySelectorAll("g[data-tape]").forEach((s) => s.remove()), this.tapes = [];
-    const c = this.o.nodes;
+    const r = this.o.nodes;
     for (let s = 0; s < this.count; s++) {
-      const i = (s + 0.5) / this.count + (e() * 2 - 1) * 0.06, a = (e() * 2 - 1) * 16, n = 34 + e() * 20, r = this.makeTape(s, i, a, n);
+      const i = (s + 0.5) / this.count + (e() * 2 - 1) * 0.06, a = (e() * 2 - 1) * 16, n = 34 + e() * 20, h = this.makeTape(s, i, a, n);
       if (this.cuts.has(s)) {
-        const h = 1 + v(`${this.seedRoute}:${s}`) % (c - 2);
-        r.cutLink = h, r.links[h] = !1;
+        const c = 1 + k(`${this.seedRoute}:${s}`) % (r - 2);
+        h.cutLink = c, h.links[c] = !1;
       }
-      this.buildGroup(r), this.tapes.push(r);
+      this.buildGroup(h), this.tapes.push(h);
     }
     for (let s = 0; s < 260; s++)
       for (const l of this.tapes) l.cutLink >= 0 && this.step(l);
     for (const s of this.tapes) this.draw(s);
     this.updateInteractivity(), !this.reduce && this.tapes.some((s) => s.cutLink >= 0) && this.kick();
   }
-  makeTape(t, e, o, c) {
-    const s = this.o.nodes, l = this.w / 2, i = Math.max(18, Math.min(this.h - 18, e * this.h)), a = Math.tan(o * Math.PI / 180), n = 4, r = this.w - 4, h = { x: n, y: i + a * (n - l) }, u = { x: r, y: i + a * (r - l) }, f = Math.max(1, Math.min(this.o.adhere, Math.floor(s / 2))), d = [];
-    let x = 0;
-    for (let m = 0; m < s; m++) {
-      const b = m / (s - 1), w = h.x + (u.x - h.x) * b, S = h.y + (u.y - h.y) * b;
-      d.push({ x: w, y: S, px: w, py: S, pin: m < f || m >= s - f }), m > 0 && (x += Math.hypot(d[m].x - d[m - 1].x, d[m].y - d[m - 1].y));
+  makeTape(t, e, o, r) {
+    const s = this.o.nodes, l = this.w / 2, i = Math.max(18, Math.min(this.h - 18, e * this.h)), a = Math.tan(o * Math.PI / 180), n = Math.max(28, r), h = -n, c = this.w + n, u = { x: h, y: i + a * (h - l) }, d = { x: c, y: i + a * (c - l) }, y = Math.max(1, Math.min(this.o.adhere, Math.floor(s / 2))), m = [];
+    let g = 0;
+    for (let p = 0; p < s; p++) {
+      const w = p / (s - 1), v = u.x + (d.x - u.x) * w, S = u.y + (d.y - u.y) * w;
+      m.push({ x: v, y: S, px: v, py: S, pin: p < y || p >= s - y }), p > 0 && (g += Math.hypot(m[p].x - m[p - 1].x, m[p].y - m[p - 1].y));
     }
-    const A = new Array(s - 1).fill(!0), g = document.createElementNS(y, "g");
-    return g.setAttribute("data-tape", String(t)), { index: t, nodes: d, links: A, rest: x / (s - 1), total: x, height: c, cutLink: -1, group: g, pieces: [] };
+    const M = new Array(s - 1).fill(!0), b = document.createElementNS(x, "g");
+    return b.setAttribute("data-tape", String(t)), { index: t, nodes: m, links: M, rest: g / (s - 1), total: g, height: r, cutLink: -1, group: b, pieces: [] };
   }
   pieceRanges(t) {
     const e = this.o.nodes, o = [];
-    let c = 0;
+    let r = 0;
     for (let s = 0; s < e - 1; s++)
-      t.links[s] || (o.push([c, s]), c = s + 1);
-    return o.push([c, e - 1]), o;
+      t.links[s] || (o.push([r, s]), r = s + 1);
+    return o.push([r, e - 1]), o;
   }
   buildGroup(t) {
     this.cordonSVG.appendChild(t.group), this.rebuildPieces(t);
@@ -186,38 +186,38 @@ class N {
   rebuildPieces(t) {
     for (; t.group.firstChild; ) t.group.removeChild(t.group.firstChild);
     t.pieces = [];
-    const e = t.height * 0.5, o = Math.max(8, Math.ceil(t.total / (this.o.message.length * t.height * 0.3))), c = this.o.message.repeat(o);
+    const e = t.height * 0.5, o = Math.max(8, Math.ceil(t.total / (this.o.message.length * t.height * 0.3))), r = this.o.message.repeat(o);
     this.pieceRanges(t).forEach(([s, l], i) => {
       if (l <= s) {
         t.pieces.push(null);
         return;
       }
-      const a = `slop-cl-${this.id}-${t.index}-${i}`, n = document.createElementNS(y, "path");
+      const a = `slop-cl-${this.id}-${t.index}-${i}`, n = document.createElementNS(x, "path");
       n.setAttribute("fill", `url(#slop-haz-${this.id})`), n.setAttribute("stroke", this.o.colors.edge), n.setAttribute("stroke-width", "2"), n.setAttribute("stroke-linejoin", "round"), n.setAttribute("stroke-linecap", "round");
-      const r = document.createElementNS(y, "path");
-      r.setAttribute("id", a), r.setAttribute("fill", "none"), r.setAttribute("stroke", "none");
-      const h = document.createElementNS(y, "text");
-      h.setAttribute("font-size", String(e)), h.setAttribute("font-weight", "700"), h.setAttribute("dominant-baseline", "central"), h.setAttribute("fill", this.o.colors.text), h.style.fontFamily = this.o.fontFamily, h.style.letterSpacing = this.o.letterSpacing, h.style.userSelect = "none";
-      const u = document.createElementNS(y, "textPath");
-      u.setAttribute("href", `#${a}`), u.setAttributeNS(P, "href", `#${a}`), u.textContent = c, h.appendChild(u), t.group.append(n, r, h), t.pieces.push({ s, e: l, ribbon: n, centerline: r });
+      const h = document.createElementNS(x, "path");
+      h.setAttribute("id", a), h.setAttribute("fill", "none"), h.setAttribute("stroke", "none");
+      const c = document.createElementNS(x, "text");
+      c.setAttribute("font-size", String(e)), c.setAttribute("font-weight", "700"), c.setAttribute("dominant-baseline", "central"), c.setAttribute("fill", this.o.colors.text), c.style.fontFamily = this.o.fontFamily, c.style.letterSpacing = this.o.letterSpacing, c.style.userSelect = "none";
+      const u = document.createElementNS(x, "textPath");
+      u.setAttribute("href", `#${a}`), u.setAttributeNS(T, "href", `#${a}`), u.textContent = r, c.appendChild(u), t.group.append(n, h, c), t.pieces.push({ s, e: l, ribbon: n, centerline: h });
     });
   }
   // ---- physics -------------------------------------------------------------
   step(t) {
-    const { gravity: e, damping: o, iterations: c } = this.o;
+    const { gravity: e, damping: o, iterations: r } = this.o;
     for (const i of t.nodes) {
       if (i.pin) continue;
       const a = (i.x - i.px) * o, n = (i.y - i.py) * o;
-      i.px = i.x, i.py = i.y, i.x += a, i.y += n + e * k * k;
+      i.px = i.x, i.py = i.y, i.x += a, i.y += n + e * A * A;
     }
     const s = this.o.nodes;
-    for (let i = 0; i < c; i++)
+    for (let i = 0; i < r; i++)
       for (let a = 0; a < s - 1; a++) {
         if (!t.links[a]) continue;
-        const n = t.nodes[a], r = t.nodes[a + 1];
-        let h = r.x - n.x, u = r.y - n.y;
-        const f = Math.hypot(h, u) || 1e-3, d = (f - t.rest) / f * 0.5;
-        h *= d, u *= d, n.pin || (n.x += h, n.y += u), r.pin || (r.x -= h, r.y -= u);
+        const n = t.nodes[a], h = t.nodes[a + 1];
+        let c = h.x - n.x, u = h.y - n.y;
+        const d = Math.hypot(c, u) || 1e-3, y = (d - t.rest) / d * 0.5;
+        c *= y, u *= y, n.pin || (n.x += c, n.y += u), h.pin || (h.x -= c, h.y -= u);
       }
     const l = t.height / 2;
     for (const i of t.nodes)
@@ -226,8 +226,8 @@ class N {
   draw(t) {
     for (const o of t.pieces) {
       if (!o) continue;
-      const { fill: c, center: s } = C(t.nodes.slice(o.s, o.e + 1), t.height);
-      o.ribbon.setAttribute("d", c), o.centerline.setAttribute("d", s);
+      const { fill: r, center: s } = P(t.nodes.slice(o.s, o.e + 1), t.height);
+      o.ribbon.setAttribute("d", r), o.centerline.setAttribute("d", s);
     }
     let e = 0;
     for (const o of t.nodes) o.pin || (e += Math.abs(o.x - o.px) + Math.abs(o.y - o.py));
@@ -240,27 +240,27 @@ class N {
   sever(t, e) {
     var s, l, i, a;
     if (t.cutLink !== -1) return !1;
-    const o = this.o.nodes, c = Math.max(1, Math.min(o - 2, e));
-    return t.cutLink = c, t.links[c] = !1, this.rebuildPieces(t), this.draw(t), this.cuts.add(t.index), this.saveCuts(), (l = (s = this.o).onCut) == null || l.call(s, { index: t.index, cutCount: this.cuts.size, total: this.count }), this.isCleared && (this.updateInteractivity(), (a = (i = this.o).onCleared) == null || a.call(i)), !0;
+    const o = this.o.nodes, r = Math.max(1, Math.min(o - 2, e));
+    return t.cutLink = r, t.links[r] = !1, this.rebuildPieces(t), this.draw(t), this.cuts.add(t.index), this.saveCuts(), (l = (s = this.o).onCut) == null || l.call(s, { index: t.index, cutCount: this.cuts.size, total: this.count }), this.isCleared && (this.updateInteractivity(), (a = (i = this.o).onCleared) == null || a.call(i)), !0;
   }
   commitSlice() {
     const t = this.o.nodes, e = this.o.cutRadius;
     for (const o of this.tapes) {
       if (o.cutLink !== -1) continue;
-      const c = this.stroke.filter((n) => {
-        let r = 1 / 0;
-        for (let h = 1; h < t - 1; h++) {
-          const u = o.nodes[h], f = Math.hypot(u.x - n.x, u.y - n.y);
-          f < r && (r = f);
+      const r = this.stroke.filter((n) => {
+        let h = 1 / 0;
+        for (let c = 1; c < t - 1; c++) {
+          const u = o.nodes[c], d = Math.hypot(u.x - n.x, u.y - n.y);
+          d < h && (h = d);
         }
-        return r < e;
+        return h < e;
       });
-      if (!c.length) continue;
-      const s = c.reduce((n, r) => n + r.x, 0) / c.length, l = c.reduce((n, r) => n + r.y, 0) / c.length;
+      if (!r.length) continue;
+      const s = r.reduce((n, h) => n + h.x, 0) / r.length, l = r.reduce((n, h) => n + h.y, 0) / r.length;
       let i = 1, a = 1 / 0;
       for (let n = 1; n < t - 1; n++) {
-        const r = o.nodes[n], h = Math.hypot(r.x - s, r.y - l);
-        h < a && (a = h, i = n);
+        const h = o.nodes[n], c = Math.hypot(h.x - s, h.y - l);
+        c < a && (a = c, i = n);
       }
       this.sever(o, i) && !this.reduce && this.kick();
     }
@@ -281,9 +281,9 @@ class N {
   }
 }
 export {
-  N as TapeCordon,
-  v as hashString,
-  M as mulberry32,
-  C as ribbonPaths
+  $ as TapeCordon,
+  k as hashString,
+  C as mulberry32,
+  P as ribbonPaths
 };
 //# sourceMappingURL=index.js.map

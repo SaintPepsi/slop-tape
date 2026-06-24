@@ -371,8 +371,11 @@ export class TapeCordon {
     const cx = this.w / 2;
     const cy = Math.max(18, Math.min(this.h - 18, yFrac * this.h));
     const slope = Math.tan((rot * Math.PI) / 180);
-    const ax = 4;
-    const bx = this.w - 4;
+    // anchor past both page edges so the diagonal end-cap sits off-screen and the
+    // page boundary clips the ribbon to a clean vertical cutoff — reads as "wrapping over the side"
+    const overhang = Math.max(28, height);
+    const ax = -overhang;
+    const bx = this.w + overhang;
     const a = { x: ax, y: cy + slope * (ax - cx) };
     const b = { x: bx, y: cy + slope * (bx - cx) };
 
