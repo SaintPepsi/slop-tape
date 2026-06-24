@@ -1,0 +1,49 @@
+{
+  "name": "slop-tape",
+  "version": "0.1.0",
+  "description": "Physics 'AI SLOP POLICE' crime-scene tape you can sling across any page and cut through. Zero-dependency, framework-agnostic.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "IDEA.md",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "tsc --noEmit"
+  },
+  "keywords": [
+    "ai-slop",
+    "crime-scene-tape",
+    "svg",
+    "physics",
+    "verlet",
+    "ribbon",
+    "overlay",
+    "cordon"
+  ],
+  "author": "Ian Hogers (SaintPepsi)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SaintPepsi/slop-tape.git"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vite": "^6.0.7",
+    "vite-plugin-dts": "^4.4.0"
+  }
+}
